@@ -68,24 +68,57 @@ class ReflexAgent(Agent):
         """
         # Useful information you can extract from a GameState (pacman.py)
         successorGameState = currentGameState.generatePacmanSuccessor(action)
+        curPos = currentGameState.getPacmanPosition()
         newPos = successorGameState.getPacmanPosition()
         newFood = successorGameState.getFood()
         newGhostStates = successorGameState.getGhostStates()
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+        ghostsPos = successorGameState.getGhostPositions()
 
         "*** YOUR CODE HERE ***"
         score = successorGameState.getScore()
+        nearestGhost = 1000
+        curToNearestGhost = 0
+        
+        for ghostPos in ghostsPos:
+            nearGhost = manhattanDistance(ghostPos, newPos)
+            if(nearGhost < nearestGhost):
+                nearestGhost = nearGhost
+                curToNearestGhost = manhattanDistance(ghostPos, curPos)
 
+        nearestFood = 1000
+        curToNearestFood = 0
+        for food in newFood.asList():
+            nearFood = manhattanDistance(food, newPos)
+            if(nearFood < nearestFood):
+                nearestFood = nearFood
+                curToNearestFood = manhattanDistance(food, curPos)
+        # this condition takes care when pacman is near to the ghost while far from the nearest food
+        if(nearestFood >= nearestGhost):
+                # meaning that pacman is getting near to the nearest food and getting far from the ghost
+                if(nearestGhost > curToNearestGhost and nearestFood < curToNearestFood):
+                    score += 2
+                else:
+                    if(nearGhost > 2):
+                        if(nearestFood < curToNearestFood):
+                            score += 1
+                    else:
+                        score -= 1
+        # if the nearest food is nearer than the ghost
+        if(nearestFood < nearestGhost):
+            if(nearestFood < curToNearestFood):
+                score += 1
+            else:
+                score -= 1
         # HINTS:
         # Given currentGameState and successorGameState, determine if the next state is good / bad
         # Compute a numerical score for next state that will reflect this
         # Base score = successorGameState.getScore() - Line 77
         # Can increase / decrease this score depending on:
-        #   new pacman position, ghost position, food position, 
+        #   new pacman position, ghost position, food position,
         #   distances to ghosts, distances to food
         # You can choose which features to use in your evaluation function
         # You can also put more weight to some features
-
         return score
 
 def scoreEvaluationFunction(currentGameState):
