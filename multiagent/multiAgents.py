@@ -184,13 +184,18 @@ class MinimaxAgent(MultiAgentSearchAgent):
     # Note: always returns (action,score) pair
     def value(self, gameState, currentAgentIndex, currentDepth):
       # pass
+      # Update the depth if the index of our pacman agent is already greater than or equal to the number of agents (if minimax have already assessed the possible moves of all adversarial agents in the current depth).
       if currentAgentIndex >= gameState.getNumAgents():
         currentAgentIndex = 0
         currentDepth += 1
 
+
+      # Stop recursion when the predfined tree limit is reached or pacman already won or lost the game.
       if currentDepth == self.depth or gameState.isWin() or gameState.isLose():
           return ('',self.evaluationFunction(gameState))
 
+
+      # If index of the agent is zero, that means it is our agent. Always get the max_value or the action which will give the highest score for our agent. However if it is not zero, it means it is an adversarial agent. For adversarial agent, assuming that it is a rational or it always chooses the optimal solution, always pick the min_value or the action that will give the worst effect (lowest score) to our pacman agent.
       if currentAgentIndex == 0:
           return self.max_value(gameState, currentAgentIndex, currentDepth)
       else:
@@ -209,6 +214,8 @@ class MinimaxAgent(MultiAgentSearchAgent):
     # Note: always returns (action,score) pair
     def max_value(self, gameState, currentAgentIndex, currentDepth):
       # pass
+
+      # Getting the agent's action that will give the highest score. Loops over each legal action or actions that the agent can do during the game. Gets the value or score by calling self.value(...) for the agent's action and compares it to the current value, then stores as the new current value which ever of them is higher. Finally returns the highest value and its corresponding action.
       current_value = float('-inf')
       action = None
       actions = gameState.getLegalActions(currentAgentIndex)
@@ -233,6 +240,8 @@ class MinimaxAgent(MultiAgentSearchAgent):
     # Note: always returns (action,score) pair
     def min_value(self, gameState, currentAgentIndex, currentDepth):
       # pass
+
+      # Getting the agent's action that will give the lowest score. Loops over each legal action or actions that the agent can do during the game. Gets the value or score by calling self.value(...) for the agent's action and compares it to the current value, then stores as the new current value which ever of them is lower. Finally returns the lowest value and its corresponding action.
       current_value = float('inf')
       action = None
       actions = gameState.getLegalActions(currentAgentIndex)
@@ -277,12 +286,18 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     # Note: always returns (action,score) pair
     def value(self, gameState, currentAgentIndex, currentDepth, alpha, beta):
       # pass
+       # Update the depth if the index of our pacman agent is already greater than or equal to the number of agents (if minimax have already assessed the possible moves of all adversarial agents in the current depth).
       if currentAgentIndex >= gameState.getNumAgents():
         currentAgentIndex = 0
         currentDepth += 1
 
+
+      # Stop recursion when the predfined tree limit is reached or pacman already won or lost the game.
       if currentDepth == self.depth or gameState.isWin() or gameState.isLose():
           return ('',self.evaluationFunction(gameState))
+
+
+      # If index of the agent is zero, that means it is our agent. Always get the max_value or the action which will give the highest score for our agent. However if it is not zero, it means it is an adversarial agent. For adversarial agent, assuming that it is a rational or it always chooses the optimal solution, always pick the min_value or the action that will give the worst effect (lowest score) to our pacman agent. It also passes the alpha and beta values as parameters to the min_value and max_value functions. Alpha and beta are used for pruning parts of the search tree which will no longer be visited.
 
       if currentAgentIndex == 0:
           return self.max_value(gameState, currentAgentIndex, currentDepth, alpha, beta)
@@ -295,6 +310,8 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     # Note: always returns (action,score) pair
     def max_value(self, gameState, currentAgentIndex, currentDepth, alpha, beta):
       # pass
+
+      # Getting the agent's action that will give the highest score. Loops over each legal action or actions that the agent can do during the game. Gets the value or score by calling self.value(...) for the agent's action and compares it to the current value, then stores as the new current value which ever of them is higher. Finally returns the highest value and its corresponding action.
       current_value = float('-inf')
       action = None
       actions = gameState.getLegalActions(currentAgentIndex)
@@ -309,9 +326,11 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
           current_value = value
           action = a
 
+        # If current value is worst than beta, immediately return the action and score, the remaining parts of the tree after the successor will be pruned. 
         if current_value> beta:
           return (action, current_value)
 
+        # Updating alpha (best possible max so far)
         alpha = max(alpha, current_value)
 
       return (action, current_value)
@@ -325,6 +344,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     def min_value(self, gameState, currentAgentIndex, currentDepth, alpha, beta):
       # pass
 
+      # Getting the agent's action that will give the lowest score. Loops over each legal action or actions that the agent can do during the game. Gets the value or score by calling self.value(...) for the agent's action and compares it to the current value, then stores as the new current value which ever of them is lower. Finally returns the lowest value and its corresponding action.
       current_value = float('inf')
       action = None
       actions = gameState.getLegalActions(currentAgentIndex)
@@ -339,8 +359,12 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
           current_value = value
           action = a
 
+
+        # If current value is worst than alpha, immediately return the action and score, the remaining parts of the tree after the successor will be pruned. 
         if current_value<   alpha:
           return (action, current_value)
+
+        # Updating beta (best possible min so far)
         beta = min(beta, current_value)
 
       return (action, current_value)
@@ -371,12 +395,18 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
     # Note: always returns (action,score) pair
     def value(self, gameState, currentAgentIndex, currentDepth):
       # pass
+
+      # Update the depth if the index of our pacman agent is already greater than or equal to the number of agents (if minimax have already assessed the possible moves of all adversarial agents in the current depth).
       if currentAgentIndex >= gameState.getNumAgents():
         currentAgentIndex = 0
         currentDepth += 1
 
+
+      # Stop recursion when the predfined tree limit is reached or pacman already won or lost the game.
       if currentDepth == self.depth or gameState.isWin() or gameState.isLose():
           return ('',self.evaluationFunction(gameState))
+
+      # If index of the agent is zero, that means it is our agent. Always get the max_value or the action which will give the highest score for our agent. However if it is not zero, it means it is an adversarial agent. For adversarial agent, assuming that it is not a rational or not all the time it chooses the optimal solution, call exp_value which will compute for the average value based on the scores produced by the adversaries' actions.
 
       if currentAgentIndex == 0:
           return self.max_value(gameState, currentAgentIndex, currentDepth)
@@ -388,6 +418,8 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
     # Note: always returns (action,score) pair
     def max_value(self, gameState, currentAgentIndex, currentDepth):
       # pass
+
+      # Getting the agent's action that will give the highest score. Loops over each legal action or actions that the agent can do during the game. Gets the value or score by calling self.value(...) for the agent's action and compares it to the current value, then stores as the new current value which ever of them is higher. Finally returns the highest value and its corresponding action.
       current_value = float('-inf')
       action = None
       actions = gameState.getLegalActions(currentAgentIndex)
@@ -405,6 +437,8 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
     # Note: always returns (action,score) pair
     def exp_value(self, gameState, currentAgentIndex, currentDepth):
       # pass
+
+      # Getting the average value based on the values produced by all of the possible actions (legal actions) for the agent. Gets the value or score by calling self.value(...) for the agent's action, computes the probability of each action and adds the result to the current value. Finally returns the current value over the total number of actions, or the average value. None is returned for the action since we are only concerned with the average value and it is hard to determine the actual action to be taken.
 
       current_value = 0
       actions = gameState.getLegalActions(currentAgentIndex)
