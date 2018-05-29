@@ -73,10 +73,11 @@ class ReflexAgent(Agent):
         newFood = successorGameState.getFood()
         newGhostStates = successorGameState.getGhostStates()
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
-        ghostsPos = successorGameState.getGhostPositions()
 
         "*** YOUR CODE HERE ***"
         score = successorGameState.getScore()
+
+        ghostsPos = successorGameState.getGhostPositions()
         nearestGhost = 1000
         curToNearestGhost = 0
         
