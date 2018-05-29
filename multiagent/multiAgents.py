@@ -83,26 +83,31 @@ class ReflexAgent(Agent):
         # You can choose which features to use in your evaluation function
         # You can also put more weight to some features
 
-        ghostPos = successorGameState.getGhostPositions()[0]
+        # get position of ghost
+        ghostPos=successorGameState.getGhostPositions()[0]
 
+        # using hint:
+        # "You can also put more weight to some features"
         # adding more weight to food and ghost for better score reflection
-        weight = 10.0
+        wt=10.0
 
-        # obtain distance of pacman from ghost
-        distPacToGhost = manhattanDistance(newPos, ghostPos)
+        # obtain distance of pacman from ghost using manhattan distance
+        pac_ghost_distance=manhattanDistance(newPos,ghostPos)
 
         # if pacman is near ghost, deduct to score
-        if distPacToGhost > 0:
-            score -= weight / distPacToGhost
+        # decreasing score based on ghost position and new pacman position
+        if pac_ghost_distance:
+            score=score-(wt/pac_ghost_distance)
 
-        # determine existing foods
-        distsPacToFood = []
+        # determine existing foods near pacman
+        pac_food_distance = []
         for food in newFood.asList():
-          distsPacToFood.append(manhattanDistance(newPos, food))
+          pac_food_distance.append(manhattanDistance(newPos,food))
 
         # if pacman is near food/s, add to score with nearest food
-        if len(distsPacToFood) != 0:
-            score += weight / min(distsPacToFood) 
+        # increasing score based on food position and new pacman position
+        if len(pac_food_distance):
+            score=score+(wt/min(pac_food_distance)) 
         
         return score
 
