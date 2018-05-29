@@ -54,21 +54,17 @@ class ReflexAgent(Agent):
     def evaluationFunction(self, currentGameState, action):
         """
         Design a better evaluation function here.
-
         The evaluation function takes in the current and proposed successor
         GameStates (pacman.py) and returns a number, where higher numbers are better.
-
         The code below extracts some useful information from the state, like the
         remaining food (newFood) and Pacman position after moving (newPos).
         newScaredTimes holds the number of moves that each ghost will remain
         scared because of Pacman having eaten a power pellet.
-
         Print out these variables to see what you're getting, then combine them
         to create a masterful evaluation function.
         """
         # Useful information you can extract from a GameState (pacman.py)
         successorGameState = currentGameState.generatePacmanSuccessor(action)
-        curPos = currentGameState.getPacmanPosition()
         newPos = successorGameState.getPacmanPosition()
         newFood = successorGameState.getFood()
         newGhostStates = successorGameState.getGhostStates()
@@ -77,40 +73,6 @@ class ReflexAgent(Agent):
         "*** YOUR CODE HERE ***"
         score = successorGameState.getScore()
 
-        ghostsPos = successorGameState.getGhostPositions()
-        nearestGhost = 1000
-        curToNearestGhost = 0
-        
-        for ghostPos in ghostsPos:
-            nearGhost = manhattanDistance(ghostPos, newPos)
-            if(nearGhost < nearestGhost):
-                nearestGhost = nearGhost
-                curToNearestGhost = manhattanDistance(ghostPos, curPos)
-
-        nearestFood = 1000
-        curToNearestFood = 0
-        for food in newFood.asList():
-            nearFood = manhattanDistance(food, newPos)
-            if(nearFood < nearestFood):
-                nearestFood = nearFood
-                curToNearestFood = manhattanDistance(food, curPos)
-        # this condition takes care when pacman is near to the ghost while far from the nearest food
-        if(nearestFood >= nearestGhost):
-                # meaning that pacman is getting near to the nearest food and getting far from the ghost
-                if(nearestGhost > curToNearestGhost and nearestFood < curToNearestFood):
-                    score += 2
-                else:
-                    if(nearGhost > 2):
-                        if(nearestFood < curToNearestFood):
-                            score += 1
-                    else:
-                        score -= 1
-        # if the nearest food is nearer than the ghost
-        if(nearestFood < nearestGhost):
-            if(nearestFood < curToNearestFood):
-                score += 1
-            else:
-                score -= 1
         # HINTS:
         # Given currentGameState and successorGameState, determine if the next state is good / bad
         # Compute a numerical score for next state that will reflect this
@@ -120,6 +82,28 @@ class ReflexAgent(Agent):
         #   distances to ghosts, distances to food
         # You can choose which features to use in your evaluation function
         # You can also put more weight to some features
+
+        ghostPos = successorGameState.getGhostPositions()[0]
+
+        # adding more weight to food and ghost for better score reflection
+        weight = 10.0
+
+        # obtain distance of pacman from ghost
+        distPacToGhost = manhattanDistance(newPos, ghostPos)
+
+        # if pacman is near ghost, deduct to score
+        if distPacToGhost > 0:
+            score -= weight / distPacToGhost
+
+        # determine existing foods
+        distsPacToFood = []
+        for food in newFood.asList():
+          distsPacToFood.append(manhattanDistance(newPos, food))
+
+        # if pacman is near food/s, add to score with nearest food
+        if len(distsPacToFood) != 0:
+            score += weight / min(distsPacToFood) 
+        
         return score
 
 def scoreEvaluationFunction(currentGameState):
