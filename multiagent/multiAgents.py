@@ -85,22 +85,26 @@ class ReflexAgent(Agent):
 
         # get position of ghost
         ghostPos=successorGameState.getGhostPositions()[0]
+        # obtain distance of pacman from ghost using manhattan distance
+        pac_ghost_distance=manhattanDistance(newPos,ghostPos)
+        pac_food_distance = []
 
         # using hint:
         # "You can also put more weight to some features"
         # adding more weight to food and ghost for better score reflection
-        wt=10.0
-
-        # obtain distance of pacman from ghost using manhattan distance
-        pac_ghost_distance=manhattanDistance(newPos,ghostPos)
+        # wt=2.0 Question q1: 3/4, pacman gets stuck sometimes (or computer just can't keep up)
+        # wt=5.0 Question q1: 3/4
+        # wt=7.0 Question q1: 3/4
+        # wt=9.0 Question q1: 3/4
+        wt=10.0 # Question q1: 4/4
 
         # if pacman is near ghost, deduct to score
         # decreasing score based on ghost position and new pacman position
         if pac_ghost_distance:
             score=score-(wt/pac_ghost_distance)
 
-        # determine existing foods near pacman
-        pac_food_distance = []
+        # determine existing foods near pacman by getting
+        # manhattan distance between pacman and food
         for food in newFood.asList():
           pac_food_distance.append(manhattanDistance(newPos,food))
 
@@ -470,7 +474,35 @@ def betterEvaluationFunction(currentGameState):
     # You can add weights to these features
     # Update the score variable (add / subtract), depending on the features and their weights
     # Note: Edit the Description in the string above to describe what you did here
+    
+    newScore = 0
+    pacmanPosition = currentGameState.getPacmanPosition()
+    ghostsPos = currentGameState.getGhostPositions(); #successor game state is not considered, i used the position of ghost from the current state replacing this-> ghostsPos = successorGameState.getGhostPositions()
+    ghostScore = 0
 
+    for ghostPos in ghostsPos:
+        nearGhost = manhattanDistance(ghostPos, pacmanPosition)
+        if(nearGhost < 2): #this tells us that pacman had a close encounter with the ghost
+          ghostScore = 10000000000 * nearGhost #we set the weight of the distance of pacman to the ghost and multiplied it to the manhattan distance
+    nearestFood = 1000
+    curToNearestFood = 0
+    for food in currentGameState.getFood().asList(): #evaluating the states of the food 
+        nearFood = manhattanDistance(food, pacmanPosition)#getting the distance of the foods
+        if(nearFood < nearestFood): 
+            nearestFood = nearFood #taking note the distance of the nearest food
+            curToNearestFood = manhattanDistance(food, pacmanPosition)
+
+    if(ghostScore>newScore): #since the fact that pacman had a close encounter with the ghost is bad, it overrules all other features
+      newScore = ghostScore
+      newScore -= 10*currentGameState.getScore()
+      
+    else: #if pacman did not have a close encounter with the ghost, we use other important features as score instead
+      newScore+=nearestFood
+      newScore+= 1000*currentGameState.getNumFood()
+      newScore+= 10*len(currentGameState.getCapsules())
+      newScore-= 10*currentGameState.getScore()
+    return newScore *(-1) #since we receprocate everything, it means that, the values we added more weight to are bad for pacman and the ones with less weight are good for pacman
+    
     return score
 
 # Abbreviation
